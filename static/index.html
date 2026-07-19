@@ -97,6 +97,19 @@
     word-break: break-all;
   }
   .doc-list li .file-icon { flex-shrink: 0; }
+  .clear-btn {
+    margin-top: 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .clear-btn:hover { border-color: #e5484d; color: #e5484d; }
+  .clear-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .main {
     flex: 1;
     display: flex;
@@ -257,6 +270,7 @@
 
     <div class="doc-list-title">Uploaded Documents</div>
     <ul class="doc-list" id="docList"></ul>
+    <button class="clear-btn" id="clearBtn">🗑 Clear documents</button>
   </aside>
 
   <main class="main">
@@ -285,7 +299,26 @@ const fileInput = document.getElementById('fileInput');
 const uploadArea = document.getElementById('uploadArea');
 const uploadStatus = document.getElementById('uploadStatus');
 const docList = document.getElementById('docList');
+const clearBtn = document.getElementById('clearBtn');
 const toast = document.getElementById('toast');
+
+let chatHistory = [];
+const MAX_HISTORY_MESSAGES = 12; // 6 user/assistant pairs
+
+function pushHistory(role, content) {
+  chatHistory.push({ role, content });
+  if (chatHistory.length > MAX_HISTORY_MESSAGES) {
+    chatHistory = chatHistory.slice(-MAX_HISTORY_MESSAGES);
+  }
+}
+
+function friendlyError(err) {
+  const msg = (err && err.message) || '';
+  if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+    return '⚠️ Could not reach the server. Make sure it is running, then try again.';
+  }
+  return `⚠️ Something went wrong: ${msg || 'unexpected error'}. Please try again.`;
+}
 
 function showToast(text) {
   toast.textContent = text;
@@ -336,10 +369,28 @@ fileInput.addEventListener('change', async () => {
     showToast(`${file.name} uploaded successfully`);
     await refreshDocuments();
   } catch (err) {
-    uploadStatus.textContent = `Error: ${err.message}`;
-    showToast(`Upload failed: ${err.message}`);
+    const friendly = friendlyError(err);
+    uploadStatus.textContent = friendly;
+    showToast(friendly);
   } finally {
     fileInput.value = '';
+  }
+});
+
+clearBtn.addEventListener('click', async () => {
+  if (!confirm('Remove all uploaded documents? This cannot be undone.')) return;
+  clearBtn.disabled = true;
+  try {
+    const res = await fetch('/documents', { method: 'DELETE' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || `Server error (${res.status})`);
+    showToast(data.cleared > 0 ? 'All documents cleared' : 'No documents to clear');
+    uploadStatus.textContent = '';
+    await refreshDocuments();
+  } catch (err) {
+    showToast(friendlyError(err));
+  } finally {
+    clearBtn.disabled = false;
   }
 });
 
@@ -356,6 +407,23 @@ function addMessage(role, text) {
   return row;
 }
 
+function attachSources(wrap, sources) {
+  if (!sources || sources.length === 0) return;
+  const details = document.createElement('details');
+  details.className = 'sources';
+  const summary = document.createElement('summary');
+  summary.textContent = `Sources (${sources.length})`;
+  details.appendChild(summary);
+
+  sources.forEach(src => {
+    const item = document.createElement('div');
+    item.className = 'source-item';
+    item.innerHTML = `<span>${escapeHtml(src.filename)} — page ${src.page}</span><span class="meta">score: ${src.score}</span>`;
+    details.appendChild(item);
+  });
+  wrap.appendChild(details);
+}
+
 function addBotMessage(answer, sources) {
   emptyState.style.display = 'none';
   const row = document.createElement('div');
@@ -368,26 +436,26 @@ function addBotMessage(answer, sources) {
   bubble.className = 'bubble';
   bubble.textContent = answer;
   wrap.appendChild(bubble);
-
-  if (sources && sources.length > 0) {
-    const details = document.createElement('details');
-    details.className = 'sources';
-    const summary = document.createElement('summary');
-    summary.textContent = `Sources (${sources.length})`;
-    details.appendChild(summary);
-
-    sources.forEach(src => {
-      const item = document.createElement('div');
-      item.className = 'source-item';
-      item.innerHTML = `<span>${escapeHtml(src.filename)} — page ${src.page}</span><span class="meta">score: ${src.score}</span>`;
-      details.appendChild(item);
-    });
-    wrap.appendChild(details);
-  }
+  attachSources(wrap, sources);
 
   row.appendChild(wrap);
   messagesEl.appendChild(row);
   messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function startBotStream() {
+  emptyState.style.display = 'none';
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+  const wrap = document.createElement('div');
+  wrap.className = 'bot-wrap';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  wrap.appendChild(bubble);
+  row.appendChild(wrap);
+  messagesEl.appendChild(row);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return { row, wrap, bubble };
 }
 
 function addThinkingIndicator() {
@@ -415,21 +483,69 @@ async function sendMessage() {
   sendBtn.disabled = true;
   addThinkingIndicator();
 
+  let stream = null;
+  let answer = '';
+  let sources = [];
+
   try {
     const res = await fetch('/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text })
+      body: JSON.stringify({ message: text, history: chatHistory })
     });
-    const data = await res.json();
-    removeThinkingIndicator();
     if (!res.ok) {
-      throw new Error(data.detail || 'Chat request failed');
+      let detail = '';
+      try { detail = (await res.json()).detail; } catch (e) {}
+      throw new Error(detail || `Server error (${res.status})`);
     }
-    addBotMessage(data.answer, data.sources);
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      let sep;
+      while ((sep = buffer.indexOf('\n\n')) !== -1) {
+        const rawEvent = buffer.slice(0, sep);
+        buffer = buffer.slice(sep + 2);
+        const dataLine = rawEvent.split('\n').find(l => l.startsWith('data: '));
+        if (!dataLine) continue;
+        let evt;
+        try { evt = JSON.parse(dataLine.slice(6)); } catch (e) { continue; }
+
+        if (evt.type === 'sources') {
+          sources = evt.sources || [];
+        } else if (evt.type === 'token') {
+          if (!stream) {
+            removeThinkingIndicator();
+            stream = startBotStream();
+          }
+          answer += evt.token;
+          stream.bubble.textContent = answer;
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+        } else if (evt.type === 'error') {
+          throw new Error(evt.message);
+        } else if (evt.type === 'done') {
+          if (stream) attachSources(stream.wrap, sources);
+        }
+      }
+    }
+
+    if (!stream) {
+      removeThinkingIndicator();
+      addBotMessage('⚠️ The server sent no response. Please try again.', []);
+    } else {
+      pushHistory('user', text);
+      pushHistory('assistant', answer);
+    }
   } catch (err) {
     removeThinkingIndicator();
-    addBotMessage(`Error: ${err.message}`, []);
+    if (stream) stream.row.remove();
+    addBotMessage(friendlyError(err), []);
   } finally {
     sendBtn.disabled = false;
     messageInput.focus();

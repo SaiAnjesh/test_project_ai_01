@@ -1,0 +1,152 @@
+{
+  "timestamp": "2026-07-19T03:56:52.660748+00:00",
+  "config": {
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 4,
+    "embedding_model": "text-embedding-3-small",
+    "llm": "gpt-4o-mini",
+    "chunks_in_store": 6
+  },
+  "summary": {
+    "hit_rate_top4": 1.0,
+    "avg_faithfulness": 5,
+    "avg_latency_ms": 801.8,
+    "avg_retrieval_ms": 179.3,
+    "avg_llm_ms": 622.5,
+    "avg_input_tokens": 434.2,
+    "avg_output_tokens": 12.6
+  },
+  "per_question": [
+    {
+      "question": "When was Northwind Robotics founded?",
+      "expected_answer": "2011",
+      "evidence_page": 1,
+      "answer": "Northwind Robotics was founded in 2011.",
+      "hit": true,
+      "faithfulness": 5,
+      "retrieval_ms": 196.4,
+      "llm_ms": 876.7,
+      "total_ms": 1073.0,
+      "input_tokens": 567,
+      "output_tokens": 10
+    },
+    {
+      "question": "What is the company motto of Northwind Robotics?",
+      "expected_answer": "Precision in Motion",
+      "evidence_page": 1,
+      "answer": "The company motto of Northwind Robotics is: Precision in Motion.",
+      "hit": true,
+      "faithfulness": 5,
+      "retrieval_ms": 241.3,
+      "llm_ms": 582.5,
+      "total_ms": 823.9,
+      "input_tokens": 570,
+      "output_tokens": 13
+    },
+    {
+      "question": "What is the payload capacity of the AtlasArm?",
+      "expected_answer": "35 kilograms",
+      "evidence_page": 2,
+      "answer": "The payload capacity of the AtlasArm is 35 kilograms.",
+      "hit": true,
+      "faithfulness": 5,
+      "retrieval_ms": 148.6,
+      "llm_ms": 696.8,
+      "total_ms": 845.4,
+      "input_tokens": 252,
+      "output_tokens": 12
+    },
+    {
+      "question": "What is the list price of the AtlasArm?",
+      "expected_answer": "48,000 dollars",
+      "evidence_page": 2,
+      "answer": "The list price of the AtlasArm is 48,000 dollars.",
+      "hit": true,
+      "faithfulness": 5,
+      "retrieval_ms": 159.6,
+      "llm_ms": 612.2,
+      "total_ms": 771.8,
+      "input_tokens": 252,
+      "output_tokens": 14
+    },
+    {
+      "question": "When was the HermesAGV released?",
+      "expected_answer": "2019",
+      "evidence_page": 2,
+      "answer": "The HermesAGV was released in 2019.",
+      "hit": true,
+      "faithfulness": 5,
+      "retrieval_ms": 186.7,
+      "llm_ms": 595.4,
+      "total_ms": 782.0,
+      "input_tokens": 466,
+      "output_tokens": 11
+    },
+    {
+      "question": "How many employees work at the headquarters in Austin?",
+      "expected_answer": "520",
+      "evidence_page": 3,
+      "answer": "520 employees work at the headquarters in Austin.",
+      "hit": true,
+      "faithfulness": 5,
+      "retrieval_ms": 173.6,
+      "llm_ms": 708.2,
+      "total_ms": 881.8,
+      "input_tokens": 543,
+      "output_tokens": 9
+    },
+    {
+      "question": "What year did Northwind Robotics open its office in Munich?",
+      "expected_answer": "2018",
+      "evidence_page": 3,
+      "answer": "Northwind Robotics opened its office in Munich, Germany in 2018.",
+      "hit": true,
+      "faithfulness": 5,
+      "retrieval_ms": 155.5,
+      "llm_ms": 595.1,
+      "total_ms": 750.7,
+      "input_tokens": 572,
+      "output_tokens": 15
+    },
+    {
+      "question": "How many vacation days do full-time employees receive?",
+      "expected_answer": "24 vacation days",
+      "evidence_page": 4,
+      "answer": "Full-time employees receive 24 vacation days per year.",
+      "hit": true,
+      "faithfulness": 5,
+      "retrieval_ms": 155.4,
+      "llm_ms": 478.6,
+      "total_ms": 634.1,
+      "input_tokens": 327,
+      "output_tokens": 11
+    },
+    {
+      "question": "What is the annual learning budget per employee?",
+      "expected_answer": "2,500 dollars",
+      "evidence_page": 4,
+      "answer": "The annual learning budget is 2,500 dollars per employee.",
+      "hit": true,
+      "faithfulness": 5,
+      "retrieval_ms": 187.3,
+      "llm_ms": 525.6,
+      "total_ms": 712.9,
+      "input_tokens": 218,
+      "output_tokens": 13
+    },
+    {
+      "question": "What was the revenue for Northwind Robotics in fiscal year 2025?",
+      "expected_answer": "312 million dollars",
+      "evidence_page": 5,
+      "answer": "The revenue for Northwind Robotics in fiscal year 2025 was 312 million dollars.",
+      "hit": true,
+      "faithfulness": 5,
+      "retrieval_ms": 188.2,
+      "llm_ms": 554.1,
+      "total_ms": 742.3,
+      "input_tokens": 575,
+      "output_tokens": 18
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "question": "When was Northwind Robotics founded?",
+    "expected_answer": "2011",
+    "evidence": "Northwind Robotics was founded in 2011 in Austin, Texas",
+    "page": 1
+  },
+  {
+    "question": "What is the company motto of Northwind Robotics?",
+    "expected_answer": "Precision in Motion",
+    "evidence": "The company motto is: Precision in Motion.",
+    "page": 1
+  },
+  {
+    "question": "What is the payload capacity of the AtlasArm?",
+    "expected_answer": "35 kilograms",
+    "evidence": "The AtlasArm has a payload capacity of 35 kilograms",
+    "page": 2
+  },
+  {
+    "question": "What is the list price of the AtlasArm?",
+    "expected_answer": "48,000 dollars",
+    "evidence": "and a list price of 48,000 dollars.",
+    "page": 2
+  },
+  {
+    "question": "When was the HermesAGV released?",
+    "expected_answer": "2019",
+    "evidence": "an autonomous guided vehicle for warehouse logistics released in 2019.",
+    "page": 2
+  },
+  {
+    "question": "How many employees work at the headquarters in Austin?",
+    "expected_answer": "520",
+    "evidence": "where 520 employees work.",
+    "page": 3
+  },
+  {
+    "question": "What year did Northwind Robotics open its office in Munich?",
+    "expected_answer": "2018",
+    "evidence": "The first international office opened in Munich, Germany in 2018",
+    "page": 3
+  },
+  {
+    "question": "How many vacation days do full-time employees receive?",
+    "expected_answer": "24 vacation days",
+    "evidence": "All full-time employees receive 24 vacation days per year",
+    "page": 4
+  },
+  {
+    "question": "What is the annual learning budget per employee?",
+    "expected_answer": "2,500 dollars",
+    "evidence": "The annual learning budget is 2,500 dollars per employee.",
+    "page": 4
+  },
+  {
+    "question": "What was the revenue for Northwind Robotics in fiscal year 2025?",
+    "expected_answer": "312 million dollars",
+    "evidence": "In fiscal year 2025 Northwind Robotics reported revenue of 312 million dollars",
+    "page": 5
+  }
+]
