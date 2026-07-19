@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG Chatbot</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-2: #1e222b;
+    --border: #2a2f3a;
+    --text: #e8eaed;
+    --muted: #9aa1ac;
+    --accent: #6366f1;
+    --accent-2: #4f46e5;
+    --user-bubble: #6366f1;
+    --bot-bubble: #232732;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .app {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+  }
+  .sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  .sidebar h1 {
+    font-size: 18px;
+    margin: 0 0 4px 0;
+  }
+  .sidebar .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .upload-area {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 18px;
+  }
+  .upload-area:hover {
+    border-color: var(--accent);
+    background: rgba(99, 102, 241, 0.06);
+  }
+  .upload-area input { display: none; }
+  .upload-area .icon { font-size: 22px; margin-bottom: 6px; }
+  .upload-area .label { font-size: 13px; color: var(--muted); }
+  .upload-status {
+    font-size: 12px;
+    color: var(--muted);
+    min-height: 16px;
+    margin-bottom: 16px;
+  }
+  .doc-list-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin: 8px 0;
+  }
+  .doc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .doc-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13px;
+    margin-bottom: 6px;
+    word-break: break-all;
+  }
+  .doc-list li .file-icon { flex-shrink: 0; }
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  .chat-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .empty-state {
+    margin: auto;
+    text-align: center;
+    color: var(--muted);
+  }
+  .empty-state .icon { font-size: 40px; margin-bottom: 10px; }
+  .msg-row {
+    display: flex;
+    width: 100%;
+  }
+  .msg-row.user { justify-content: flex-end; }
+  .msg-row.bot { justify-content: flex-start; }
+  .bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 14px;
+    line-height: 1.5;
+    font-size: 14px;
+    white-space: pre-wrap;
+  }
+  .msg-row.user .bubble {
+    background: var(--user-bubble);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+  .msg-row.bot .bubble {
+    background: var(--bot-bubble);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+  .bot-wrap { max-width: 70%; display: flex; flex-direction: column; gap: 6px; }
+  .sources {
+    font-size: 12px;
+  }
+  .sources summary {
+    cursor: pointer;
+    color: var(--muted);
+    padding: 4px 0;
+    user-select: none;
+  }
+  .sources summary:hover { color: var(--text); }
+  .source-item {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-top: 6px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .source-item .meta { color: var(--muted); }
+  .thinking {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 16px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    animation: blink 1.4s infinite both;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0.2; }
+    40% { opacity: 1; }
+  }
+  .input-bar {
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    gap: 10px;
+  }
+  .input-bar textarea {
+    flex: 1;
+    resize: none;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    max-height: 120px;
+  }
+  .input-bar textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .send-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .send-btn:hover { background: var(--accent-2); }
+  .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <h1>RAG Chatbot</h1>
+    <div class="subtitle">Ask questions about your PDFs</div>
+
+    <label class="upload-area" id="uploadArea">
+      <div class="icon">📄</div>
+      <div class="label">Click to upload a PDF</div>
+      <input type="file" id="fileInput" accept="application/pdf">
+    </label>
+    <div class="upload-status" id="uploadStatus"></div>
+
+    <div class="doc-list-title">Uploaded Documents</div>
+    <ul class="doc-list" id="docList"></ul>
+  </aside>
+
+  <main class="main">
+    <div class="chat-header">Chat</div>
+    <div class="messages" id="messages">
+      <div class="empty-state" id="emptyState">
+        <div class="icon">💬</div>
+        <div>Upload a PDF and start asking questions</div>
+      </div>
+    </div>
+    <div class="input-bar">
+      <textarea id="messageInput" placeholder="Ask a question about your documents..." rows="1"></textarea>
+      <button class="send-btn" id="sendBtn">Send</button>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const messagesEl = document.getElementById('messages');
+const emptyState = document.getElementById('emptyState');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const fileInput = document.getElementById('fileInput');
+const uploadArea = document.getElementById('uploadArea');
+const uploadStatus = document.getElementById('uploadStatus');
+const docList = document.getElementById('docList');
+const toast = document.getElementById('toast');
+
+function showToast(text) {
+  toast.textContent = text;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+async function refreshDocuments() {
+  try {
+    const res = await fetch('/documents');
+    const data = await res.json();
+    docList.innerHTML = '';
+    (data.filenames || []).forEach(name => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="file-icon">📄</span><span>${escapeHtml(name)}</span>`;
+      docList.appendChild(li);
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+uploadArea.addEventListener('click', (e) => {
+  // label already triggers input click; avoid double trigger
+});
+
+fileInput.addEventListener('change', async () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+  uploadStatus.textContent = `Uploading ${file.name}...`;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const res = await fetch('/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detail || 'Upload failed');
+    }
+    uploadStatus.textContent = `Added ${data.chunks_added} chunks from ${data.filename}`;
+    showToast(`${file.name} uploaded successfully`);
+    await refreshDocuments();
+  } catch (err) {
+    uploadStatus.textContent = `Error: ${err.message}`;
+    showToast(`Upload failed: ${err.message}`);
+  } finally {
+    fileInput.value = '';
+  }
+});
+
+function addMessage(role, text) {
+  emptyState.style.display = 'none';
+  const row = document.createElement('div');
+  row.className = `msg-row ${role}`;
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return row;
+}
+
+function addBotMessage(answer, sources) {
+  emptyState.style.display = 'none';
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'bot-wrap';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = answer;
+  wrap.appendChild(bubble);
+
+  if (sources && sources.length > 0) {
+    const details = document.createElement('details');
+    details.className = 'sources';
+    const summary = document.createElement('summary');
+    summary.textContent = `Sources (${sources.length})`;
+    details.appendChild(summary);
+
+    sources.forEach(src => {
+      const item = document.createElement('div');
+      item.className = 'source-item';
+      item.innerHTML = `<span>${escapeHtml(src.filename)} — page ${src.page}</span><span class="meta">score: ${src.score}</span>`;
+      details.appendChild(item);
+    });
+    wrap.appendChild(details);
+  }
+
+  row.appendChild(wrap);
+  messagesEl.appendChild(row);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function addThinkingIndicator() {
+  emptyState.style.display = 'none';
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+  row.id = 'thinkingRow';
+  row.innerHTML = `<div class="bubble thinking"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+  messagesEl.appendChild(row);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function removeThinkingIndicator() {
+  const row = document.getElementById('thinkingRow');
+  if (row) row.remove();
+}
+
+async function sendMessage() {
+  const text = messageInput.value.trim();
+  if (!text) return;
+
+  addMessage('user', text);
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
+  sendBtn.disabled = true;
+  addThinkingIndicator();
+
+  try {
+    const res = await fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    removeThinkingIndicator();
+    if (!res.ok) {
+      throw new Error(data.detail || 'Chat request failed');
+    }
+    addBotMessage(data.answer, data.sources);
+  } catch (err) {
+    removeThinkingIndicator();
+    addBotMessage(`Error: ${err.message}`, []);
+  } finally {
+    sendBtn.disabled = false;
+    messageInput.focus();
+  }
+}
+
+sendBtn.addEventListener('click', sendMessage);
+messageInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+messageInput.addEventListener('input', () => {
+  messageInput.style.height = 'auto';
+  messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+});
+
+refreshDocuments();
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+[project]
+name = "test-project-ai-01"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = []
