@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: rag-chatbot
+    runtime: docker
+    plan: free
+    healthCheckPath: /documents
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false # set the real key in the Render dashboard

@@ -76,15 +76,22 @@ vectorstore = Chroma(
 )
 
 # Chunks scoring below this cosine relevance are dropped from the LLM prompt
-# and the sources list; if nothing passes, the app refuses without calling the LLM.
+# and the sources list. Vague or meta questions ("tell me about the document")
+# can score low against every chunk, so when nothing passes we still send the
+# top 2 candidates and let the model decide instead of refusing outright.
 MIN_RELEVANCE = 0.25
+FALLBACK_CHUNKS = 2
 
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 
 SYSTEM_PROMPT = (
     "You are a helpful assistant that answers questions using ONLY the provided "
-    "context extracted from uploaded documents. If the context does not contain "
-    "the information needed to answer the question, respond exactly with: "
+    "context extracted from uploaded documents. "
+    "If the user asks what the documents contain, asks for a summary or overview, "
+    "or asks a general question about the uploaded files, describe or summarize "
+    "the provided context — mention the filenames and what each contains. "
+    "For any other question, if the context does not contain the information "
+    "needed to answer it, respond exactly with: "
     "\"I don't have that information in the uploaded documents\". "
     "Do not use any outside knowledge. Be concise and accurate. "
     "Earlier conversation turns may be provided; use them only to understand "
@@ -263,7 +270,10 @@ async def chat(request: ChatRequest):
             )
             return
 
-        results = [(doc, score) for doc, score in results if score >= MIN_RELEVANCE]
+        relevant = [(doc, score) for doc, score in results if score >= MIN_RELEVANCE]
+        if not relevant and results:
+            relevant = results[:FALLBACK_CHUNKS]
+        results = relevant
 
         if not results:
             finish("no_results")

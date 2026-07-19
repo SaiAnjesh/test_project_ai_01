@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-19T03:56:52.660748+00:00",
+  "timestamp": "2026-07-19T04:12:11.233676+00:00",
   "config": {
     "chunk_size": 1000,
     "chunk_overlap": 200,
@@ -11,11 +11,11 @@
   "summary": {
     "hit_rate_top4": 1.0,
     "avg_faithfulness": 5,
-    "avg_latency_ms": 801.8,
-    "avg_retrieval_ms": 179.3,
-    "avg_llm_ms": 622.5,
-    "avg_input_tokens": 434.2,
-    "avg_output_tokens": 12.6
+    "avg_latency_ms": 859.1,
+    "avg_retrieval_ms": 224.3,
+    "avg_llm_ms": 634.8,
+    "avg_input_tokens": 479.2,
+    "avg_output_tokens": 12.8
   },
   "per_question": [
     {
@@ -25,10 +25,10 @@
       "answer": "Northwind Robotics was founded in 2011.",
       "hit": true,
       "faithfulness": 5,
-      "retrieval_ms": 196.4,
-      "llm_ms": 876.7,
-      "total_ms": 1073.0,
-      "input_tokens": 567,
+      "retrieval_ms": 568.9,
+      "llm_ms": 720.5,
+      "total_ms": 1289.4,
+      "input_tokens": 612,
       "output_tokens": 10
     },
     {
@@ -38,10 +38,10 @@
       "answer": "The company motto of Northwind Robotics is: Precision in Motion.",
       "hit": true,
       "faithfulness": 5,
-      "retrieval_ms": 241.3,
-      "llm_ms": 582.5,
-      "total_ms": 823.9,
-      "input_tokens": 570,
+      "retrieval_ms": 177.5,
+      "llm_ms": 678.1,
+      "total_ms": 855.5,
+      "input_tokens": 615,
       "output_tokens": 13
     },
     {
@@ -51,10 +51,10 @@
       "answer": "The payload capacity of the AtlasArm is 35 kilograms.",
       "hit": true,
       "faithfulness": 5,
-      "retrieval_ms": 148.6,
-      "llm_ms": 696.8,
-      "total_ms": 845.4,
-      "input_tokens": 252,
+      "retrieval_ms": 349.5,
+      "llm_ms": 572.9,
+      "total_ms": 922.5,
+      "input_tokens": 297,
       "output_tokens": 12
     },
     {
@@ -64,10 +64,10 @@
       "answer": "The list price of the AtlasArm is 48,000 dollars.",
       "hit": true,
       "faithfulness": 5,
-      "retrieval_ms": 159.6,
-      "llm_ms": 612.2,
-      "total_ms": 771.8,
-      "input_tokens": 252,
+      "retrieval_ms": 169.5,
+      "llm_ms": 653.4,
+      "total_ms": 822.9,
+      "input_tokens": 297,
       "output_tokens": 14
     },
     {
@@ -77,24 +77,24 @@
       "answer": "The HermesAGV was released in 2019.",
       "hit": true,
       "faithfulness": 5,
-      "retrieval_ms": 186.7,
-      "llm_ms": 595.4,
-      "total_ms": 782.0,
-      "input_tokens": 466,
+      "retrieval_ms": 151.6,
+      "llm_ms": 580.0,
+      "total_ms": 731.6,
+      "input_tokens": 511,
       "output_tokens": 11
     },
     {
       "question": "How many employees work at the headquarters in Austin?",
       "expected_answer": "520",
       "evidence_page": 3,
-      "answer": "520 employees work at the headquarters in Austin.",
+      "answer": "520 employees work at the headquarters in Austin, Texas.",
       "hit": true,
       "faithfulness": 5,
-      "retrieval_ms": 173.6,
-      "llm_ms": 708.2,
-      "total_ms": 881.8,
-      "input_tokens": 543,
-      "output_tokens": 9
+      "retrieval_ms": 156.6,
+      "llm_ms": 559.9,
+      "total_ms": 716.5,
+      "input_tokens": 588,
+      "output_tokens": 11
     },
     {
       "question": "What year did Northwind Robotics open its office in Munich?",
@@ -103,10 +103,10 @@
       "answer": "Northwind Robotics opened its office in Munich, Germany in 2018.",
       "hit": true,
       "faithfulness": 5,
-      "retrieval_ms": 155.5,
-      "llm_ms": 595.1,
-      "total_ms": 750.7,
-      "input_tokens": 572,
+      "retrieval_ms": 170.6,
+      "llm_ms": 574.4,
+      "total_ms": 745.0,
+      "input_tokens": 617,
       "output_tokens": 15
     },
     {
@@ -116,10 +116,10 @@
       "answer": "Full-time employees receive 24 vacation days per year.",
       "hit": true,
       "faithfulness": 5,
-      "retrieval_ms": 155.4,
-      "llm_ms": 478.6,
-      "total_ms": 634.1,
-      "input_tokens": 327,
+      "retrieval_ms": 164.3,
+      "llm_ms": 622.1,
+      "total_ms": 786.4,
+      "input_tokens": 372,
       "output_tokens": 11
     },
     {
@@ -129,23 +129,23 @@
       "answer": "The annual learning budget is 2,500 dollars per employee.",
       "hit": true,
       "faithfulness": 5,
-      "retrieval_ms": 187.3,
-      "llm_ms": 525.6,
-      "total_ms": 712.9,
-      "input_tokens": 218,
+      "retrieval_ms": 153.3,
+      "llm_ms": 668.2,
+      "total_ms": 821.5,
+      "input_tokens": 263,
       "output_tokens": 13
     },
     {
       "question": "What was the revenue for Northwind Robotics in fiscal year 2025?",
       "expected_answer": "312 million dollars",
       "evidence_page": 5,
-      "answer": "The revenue for Northwind Robotics in fiscal year 2025 was 312 million dollars.",
+      "answer": "In fiscal year 2025, Northwind Robotics reported revenue of 312 million dollars.",
       "hit": true,
       "faithfulness": 5,
-      "retrieval_ms": 188.2,
-      "llm_ms": 554.1,
-      "total_ms": 742.3,
-      "input_tokens": 575,
+      "retrieval_ms": 181.1,
+      "llm_ms": 718.7,
+      "total_ms": 899.8,
+      "input_tokens": 620,
       "output_tokens": 18
     }
   ]

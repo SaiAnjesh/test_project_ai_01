@@ -1,0 +1,17 @@
+.env
+.venv/
+.git/
+.idea/
+chroma_db/
+logs/
+__pycache__/
+*.pyc
+eval.py
+eval_questions.json
+eval_results.json
+test_document.pdf
+example.py
+uv.lock
+pyproject.toml
+README.md
+render.yaml

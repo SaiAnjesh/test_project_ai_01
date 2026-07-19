@@ -110,6 +110,12 @@
   }
   .clear-btn:hover { border-color: #e5484d; color: #e5484d; }
   .clear-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .demo-note {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+  }
   .main {
     flex: 1;
     display: flex;
@@ -271,6 +277,7 @@
     <div class="doc-list-title">Uploaded Documents</div>
     <ul class="doc-list" id="docList"></ul>
     <button class="clear-btn" id="clearBtn">🗑 Clear documents</button>
+    <div class="demo-note">Demo: uploaded documents reset periodically</div>
   </aside>
 
   <main class="main">

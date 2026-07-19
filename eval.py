@@ -23,6 +23,7 @@ from langchain_core.documents import Document
 from langchain_openai import ChatOpenAI
 
 from main import (
+    FALLBACK_CHUNKS,
     MIN_RELEVANCE,
     NO_INFO_ANSWER,
     OPENAI_API_KEY,
@@ -140,8 +141,11 @@ def run_pipeline(question: str) -> dict:
     retrieval_ms = (time.perf_counter() - t0) * 1000
 
     # Same prompt filter as the app: hit rate is judged on the raw top-4,
-    # but only chunks above MIN_RELEVANCE are sent to the LLM.
+    # but only chunks above MIN_RELEVANCE are sent to the LLM (with the same
+    # top-2 fallback for questions that score low against every chunk).
     prompt_results = [(doc, score) for doc, score in results if score >= MIN_RELEVANCE]
+    if not prompt_results and results:
+        prompt_results = results[:FALLBACK_CHUNKS]
     context_blocks = [
         f"[Source: {doc.metadata.get('filename', '?')}, page {doc.metadata.get('page', '?')}]\n"
         f"{doc.page_content}"
