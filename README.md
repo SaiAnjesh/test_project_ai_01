@@ -1,6 +1,6 @@
 # 📄 RAG Chatbot — Chat with your PDFs
 
-**🔗 Live demo:** [https://rag-chatbot.onrender.com](#) *(placeholder — replace after deploying to Render)*
+**🔗 Live demo:** <https://test-project-ai-01.onrender.com> *(free tier — first load after idle takes ~30–60 s to wake up)*
 
 A production-style Retrieval-Augmented Generation chatbot that answers questions **only** from the PDFs you upload — with streaming answers, cited sources, structured observability, and a measured evaluation suite.
 
